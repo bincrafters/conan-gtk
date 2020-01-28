@@ -1,4 +1,4 @@
 sources:
-  "1.0.0":
-    url: "https://github.com/libauthor/libname"
-    sha256: "98f6f57aab0a424469619ed3047728f0d3901ce8f0dea919c11e7966d807e870"
+  "3.24.13":
+    url: "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.13.tar.xz"
+    sha256: "4c775c38cf1e3c534ef0ca52ca6c7a890fe169981af66141c713e054e68930a9"

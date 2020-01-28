@@ -1,53 +1,121 @@
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, Meson, tools
+from conans.errors import ConanInvalidConfiguration
 import os
+import shutil
 
 
 class LibnameConan(ConanFile):
-    name = "libname"
-    description = "Keep it short"
-    topics = ("conan", "libname", "logging")
-    url = "https://github.com/bincrafters/conan-libname"
-    homepage = "https://github.com/original_author/original_lib"
-    license = "MIT"  # Indicates license type of the packaged library; please use SPDX Identifiers https://spdx.org/licenses/
-    # Remove following lines if the target lib does not use CMake
-    exports_sources = ["CMakeLists.txt"]
-    generators = "cmake"
+    name = "gtk"
+    description = "libraries used for creating graphical user interfaces for applications."
+    topics = ("conan", "gtk", "widgets")
+    url = "https://github.com/bincrafters/conan-gtk"
+    homepage = "https://www.gtk.org/"
+    license = "LGPL-2.1"
+    generators = "pkg_config"
 
     # Options may need to change depending on the packaged library
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {"shared": False, "fPIC": True}
+    options = {
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "with_wayland": [True, False],
+        "with_x11": [True, False],
+        "with_pango": [True, False]
+        }
+    default_options = {
+        "shared": False,
+        "fPIC": True,
+        "with_wayland": False,
+        "with_x11": True,
+        "with_pango": True}
 
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
-    requires = (
-        "zlib/1.2.11"
-    )
-
     def config_options(self):
         if self.settings.os == 'Windows':
             del self.options.fPIC
+    
+    def build_requirements(self):
+        self.build_requires('meson/0.53.0')
+        #self.build_requires('pkg-config_installer/0.29.2@bincrafters/stable')
+    
+    def requirements(self):
+        if self.settings.compiler != 'Visual Studio':
+            self.requires("cairo/1.17.2@bincrafters/testing")
+        if self.options.with_wayland:
+            self.requires("xkbcommon/0.9.1@bincrafters/stable")
+            self.requires("wayland")
+        if self.options.with_pango:
+            self.requires("pango/1.43.0@bincrafters/testing")
+        if self.options.with_x11:
+            self.requires("libxrandr/1.5.2@bincrafters/stable")
+            self.requires("libxrender/0.9.10@bincrafters/stable")
+            self.requires("libx11/1.6.8@bincrafters/stable")
+            self.requires("libxi/1.7.10@bincrafters/stable")
+            self.requires("libxext/1.3.4@bincrafters/stable")
+            self.requires("libxcursor/1.2.0@bincrafters/stable")
+            self.requires("libxdamage/1.1.5@bincrafters/stable")
+            self.requires("libxfixes/5.0.3@bincrafters/stable")
+            self.requires("libxcomposite/0.4.5@bincrafters/stable")
+            self.requires("fontconfig/2.13.91@conan/stable")
+            self.requires("libxinerama/1.1.4@bincrafters/stable")
+
+    def system_requirements(self):
+        if self.options.with_x11:
+            installer = tools.SystemPackageTool()
+            installer.install("libatk-bridge2.0-dev")
+            installer.install("libgdk-pixbuf2.0-dev")
+            installer.install("libepoxy-dev")
+            installer.install("libatk1.0-dev")
+
+    def configure(self):
+        del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
+        if self.options.with_wayland or self.options.with_x11:
+            if self.settings.os == 'Windows' or self.settings.os == 'Macos':
+                raise ConanInvalidConfiguration('wayland and x11 options are not supported on windows and macos')
+        if self.options.with_wayland or self.options.with_x11:
+            if not self.options.with_pango:
+                raise ConanInvalidConfiguration('with_pango option is mandatory when with_wayland or with_x11 is used')
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
         extracted_dir = self.name + "-" + self.version
-        os.rename(extracted_dir, self._source_subfolder)
+        os.rename(extracted_dir.replace('gtk', 'gtk+'), self._source_subfolder)
 
-    def _configure_cmake(self):
-        cmake = CMake(self)
-        cmake.definitions["BUILD_TESTS"] = False  # example
-        cmake.configure(build_folder=self._build_subfolder)
-        return cmake
+    def _configure_meson(self):
+        meson = Meson(self)
+        defs = {}
+        defs['wayland_backend'] = 'true' if self.options.with_wayland else 'false'
+        defs['x11_backend'] = 'true' if self.options.with_x11 else 'false'
+        defs['introspection'] = 'false'
+        defs['documentation'] = 'false'
+        defs['man-pages'] = 'false'
+        defs['tests'] = 'false'
+        defs['examples'] = 'false'
+        defs['demos'] = 'false'
+        args=[]
+        args.append('--wrap-mode=nofallback')
+        meson.configure(defs=defs, build_folder=self._build_subfolder, source_folder=self._source_subfolder, pkg_config_paths='.', args=args)
+        return meson
 
     def build(self):
-        cmake = self._configure_cmake()
-        cmake.build()
+        for package in self.deps_cpp_info.deps:
+            lib_path = self.deps_cpp_info[package].rootpath
+            for dirpath, _, filenames in os.walk(lib_path):
+                for filename in filenames:
+                    if filename.endswith('.pc'):
+                        shutil.copyfile(os.path.join(dirpath, filename), filename)
+                        tools.replace_prefix_in_pc_file(filename, lib_path)
+        with tools.environment_append({'LDFLAGS':'-ldl'}):
+            meson = self._configure_meson()
+            meson.build()
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
-        cmake = self._configure_cmake()
-        cmake.install()
+        meson = self._configure_meson()
+        meson.install()
         # If the CMakeLists.txt has a proper install method, the steps below may be redundant
         # If so, you can just remove the lines below
         include_folder = os.path.join(self._source_subfolder, "include")
@@ -60,3 +128,6 @@ class LibnameConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.includedirs  = [os.path.join('include', 'gtk-3.0')]
+        self.cpp_info.includedirs  = [os.path.join('include', 'gtk-3.0')]
+        self.cpp_info.names['pkg_config'] = 'gtk+-3.0'
