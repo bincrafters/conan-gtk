@@ -35,6 +35,9 @@ class LibnameConan(ConanFile):
     def config_options(self):
         if self.settings.os == 'Windows':
             del self.options.fPIC
+        if self.settings.os != 'Linux':
+            del self.options.with_wayland
+            del self.options.with_x11
     
     def build_requirements(self):
         self.build_requires('meson/0.53.0')
@@ -42,42 +45,42 @@ class LibnameConan(ConanFile):
     
     def requirements(self):
         if self.settings.compiler != 'Visual Studio':
-            self.requires("cairo/1.17.2@bincrafters/testing")
-        if self.options.with_wayland:
-            self.requires("xkbcommon/0.9.1@bincrafters/stable")
-            self.requires("wayland")
+            self.requires("cairo/1.17.2@bincrafters/stable")
+        if self.settings.os == 'Linux':
+            if self.options.with_wayland:
+                self.requires("xkbcommon/0.9.1@bincrafters/stable")
+                self.requires("wayland")
+            if self.options.with_x11:
+                self.requires("libxrandr/1.5.2@bincrafters/stable")
+                self.requires("libxrender/0.9.10@bincrafters/stable")
+                self.requires("libx11/1.6.8@bincrafters/stable")
+                self.requires("libxi/1.7.10@bincrafters/stable")
+                self.requires("libxext/1.3.4@bincrafters/stable")
+                self.requires("libxcursor/1.2.0@bincrafters/stable")
+                self.requires("libxdamage/1.1.5@bincrafters/stable")
+                self.requires("libxfixes/5.0.3@bincrafters/stable")
+                self.requires("libxcomposite/0.4.5@bincrafters/stable")
+                self.requires("fontconfig/2.13.91@conan/stable")
+                self.requires("libxinerama/1.1.4@bincrafters/stable")
         if self.options.with_pango:
-            self.requires("pango/1.43.0@bincrafters/testing")
-        if self.options.with_x11:
-            self.requires("libxrandr/1.5.2@bincrafters/stable")
-            self.requires("libxrender/0.9.10@bincrafters/stable")
-            self.requires("libx11/1.6.8@bincrafters/stable")
-            self.requires("libxi/1.7.10@bincrafters/stable")
-            self.requires("libxext/1.3.4@bincrafters/stable")
-            self.requires("libxcursor/1.2.0@bincrafters/stable")
-            self.requires("libxdamage/1.1.5@bincrafters/stable")
-            self.requires("libxfixes/5.0.3@bincrafters/stable")
-            self.requires("libxcomposite/0.4.5@bincrafters/stable")
-            self.requires("fontconfig/2.13.91@conan/stable")
-            self.requires("libxinerama/1.1.4@bincrafters/stable")
+            self.requires("pango/1.43.0@bincrafters/stable")
 
     def system_requirements(self):
-        if self.options.with_x11:
-            installer = tools.SystemPackageTool()
-            installer.install("libatk-bridge2.0-dev")
-            installer.install("libgdk-pixbuf2.0-dev")
-            installer.install("libepoxy-dev")
-            installer.install("libatk1.0-dev")
+        if self.settings.os == 'Linux':
+            if self.options.with_x11:
+                installer = tools.SystemPackageTool()
+                installer.install("libatk-bridge2.0-dev")
+                installer.install("libgdk-pixbuf2.0-dev")
+                installer.install("libepoxy-dev")
+                installer.install("libatk1.0-dev")
 
     def configure(self):
         del self.settings.compiler.libcxx
         del self.settings.compiler.cppstd
-        if self.options.with_wayland or self.options.with_x11:
-            if self.settings.os == 'Windows' or self.settings.os == 'Macos':
-                raise ConanInvalidConfiguration('wayland and x11 options are not supported on windows and macos')
-        if self.options.with_wayland or self.options.with_x11:
-            if not self.options.with_pango:
-                raise ConanInvalidConfiguration('with_pango option is mandatory when with_wayland or with_x11 is used')
+        if self.settings.os == 'Linux':
+            if self.options.with_wayland or self.options.with_x11:
+                if not self.options.with_pango:
+                    raise ConanInvalidConfiguration('with_pango option is mandatory when with_wayland or with_x11 is used')
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
@@ -87,8 +90,9 @@ class LibnameConan(ConanFile):
     def _configure_meson(self):
         meson = Meson(self)
         defs = {}
-        defs['wayland_backend'] = 'true' if self.options.with_wayland else 'false'
-        defs['x11_backend'] = 'true' if self.options.with_x11 else 'false'
+        if self.settings.os == 'Linux':
+            defs['wayland_backend'] = 'true' if self.options.with_wayland else 'false'
+            defs['x11_backend'] = 'true' if self.options.with_x11 else 'false'
         defs['introspection'] = 'false'
         defs['documentation'] = 'false'
         defs['man-pages'] = 'false'
