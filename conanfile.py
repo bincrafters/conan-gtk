@@ -47,6 +47,8 @@ class LibnameConan(ConanFile):
         if self.settings.compiler != 'Visual Studio':
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == 'Linux':
+            self.requires("at-spi2-atk/2.34.1@bincrafters/stable")
+            self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
             if self.options.with_wayland:
                 self.requires("xkbcommon/0.9.1@bincrafters/stable")
                 self.requires("wayland")
@@ -63,16 +65,13 @@ class LibnameConan(ConanFile):
                 self.requires("fontconfig/2.13.91@conan/stable")
                 self.requires("libxinerama/1.1.4@bincrafters/stable")
         if self.options.with_pango:
-            self.requires("pango/1.43.0@bincrafters/stable")
+            self.requires("pango/1.44.7@bincrafters/stable")
 
     def system_requirements(self):
         if self.settings.os == 'Linux':
             if self.options.with_x11:
                 installer = tools.SystemPackageTool()
-                installer.install("libatk-bridge2.0-dev")
-                installer.install("libgdk-pixbuf2.0-dev")
                 installer.install("libepoxy-dev")
-                installer.install("libatk1.0-dev")
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -101,7 +100,7 @@ class LibnameConan(ConanFile):
         defs['demos'] = 'false'
         args=[]
         args.append('--wrap-mode=nofallback')
-        meson.configure(defs=defs, build_folder=self._build_subfolder, source_folder=self._source_subfolder, pkg_config_paths='.', args=args)
+        meson.configure(defs=defs, build_folder=self._build_subfolder, source_folder=self._source_subfolder, pkg_config_paths=[self.install_folder], args=args)
         return meson
 
     def build(self):
@@ -112,7 +111,7 @@ class LibnameConan(ConanFile):
                     if filename.endswith('.pc'):
                         shutil.copyfile(os.path.join(dirpath, filename), filename)
                         tools.replace_prefix_in_pc_file(filename, lib_path)
-        with tools.environment_append({'LDFLAGS':'-ldl'}):
+        with tools.environment_append(tools.RunEnvironment(self).vars):
             meson = self._configure_meson()
             meson.build()
 
@@ -133,5 +132,5 @@ class LibnameConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
         self.cpp_info.includedirs  = [os.path.join('include', 'gtk-3.0')]
-        self.cpp_info.includedirs  = [os.path.join('include', 'gtk-3.0')]
+        self.cpp_info.includedirs  = [os.path.join('include', 'gail-3.0')]
         self.cpp_info.names['pkg_config'] = 'gtk+-3.0'
