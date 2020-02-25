@@ -109,6 +109,8 @@ class LibnameConan(ConanFile):
             for dirpath, _, filenames in os.walk(lib_path):
                 for filename in filenames:
                     if filename.endswith('.pc'):
+                        if filename in ["cairo.pc", "fontconfig.pc", "xext.pc", "xi.pc", "x11.pc", "xcb.pc"]:
+                            continue
                         shutil.copyfile(os.path.join(dirpath, filename), filename)
                         tools.replace_prefix_in_pc_file(filename, lib_path)
         with tools.environment_append(tools.RunEnvironment(self).vars):
@@ -130,7 +132,8 @@ class LibnameConan(ConanFile):
         self.copy(pattern="*.dylib", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
-        self.cpp_info.includedirs  = [os.path.join('include', 'gtk-3.0')]
-        self.cpp_info.includedirs  = [os.path.join('include', 'gail-3.0')]
+        self.cpp_info.libs = [l for l in tools.collect_libs(self) if not l.startswith('im-')]
+        self.cpp_info.includedirs.append(os.path.join('include', 'gtk-3.0'))
+        self.cpp_info.includedirs.append(os.path.join('include', 'gail-3.0'))
         self.cpp_info.names['pkg_config'] = 'gtk+-3.0'
+        self.cpp_info.system_libs = ['epoxy']
