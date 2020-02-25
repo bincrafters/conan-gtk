@@ -44,11 +44,11 @@ class LibnameConan(ConanFile):
         #self.build_requires('pkg-config_installer/0.29.2@bincrafters/stable')
     
     def requirements(self):
+        self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
         if self.settings.compiler != 'Visual Studio':
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == 'Linux':
             self.requires("at-spi2-atk/2.34.1@bincrafters/stable")
-            self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
             if self.options.with_wayland:
                 self.requires("xkbcommon/0.9.1@bincrafters/stable")
                 self.requires("wayland")
