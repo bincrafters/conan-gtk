@@ -128,7 +128,7 @@ class LibnameConan(ConanFile):
         self.copy(pattern="*.dylib", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ['gailutil-3', 'gtk-3', 'gdk-3', 'gdk-x11']
+        self.cpp_info.libs = ['gailutil-3', 'gtk-3', 'gdk-3']
         self.cpp_info.includedirs.append(os.path.join('include', 'gtk-3.0'))
         self.cpp_info.includedirs.append(os.path.join('include', 'gail-3.0'))
         self.cpp_info.names['pkg_config'] = 'gtk+-3.0'
