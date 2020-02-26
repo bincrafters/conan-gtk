@@ -64,14 +64,9 @@ class LibnameConan(ConanFile):
                 self.requires("libxcomposite/0.4.5@bincrafters/stable")
                 self.requires("fontconfig/2.13.91@conan/stable")
                 self.requires("libxinerama/1.1.4@bincrafters/stable")
+        self.requires("libepoxy/1.5.4@bincrafters/stable")
         if self.options.with_pango:
             self.requires("pango/1.44.7@bincrafters/stable")
-
-    def system_requirements(self):
-        if self.settings.os == 'Linux':
-            if self.options.with_x11:
-                installer = tools.SystemPackageTool()
-                installer.install("libepoxy-dev")
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -136,4 +131,3 @@ class LibnameConan(ConanFile):
         self.cpp_info.includedirs.append(os.path.join('include', 'gtk-3.0'))
         self.cpp_info.includedirs.append(os.path.join('include', 'gail-3.0'))
         self.cpp_info.names['pkg_config'] = 'gtk+-3.0'
-        self.cpp_info.system_libs = ['epoxy']
