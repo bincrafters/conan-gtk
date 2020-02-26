@@ -132,3 +132,5 @@ class LibnameConan(ConanFile):
         self.cpp_info.includedirs.append(os.path.join('include', 'gtk-3.0'))
         self.cpp_info.includedirs.append(os.path.join('include', 'gail-3.0'))
         self.cpp_info.names['pkg_config'] = 'gtk+-3.0'
+        if self.settings.os == "Macos":
+            self.cpp_info.frameworks = ["AppKit", "Carbon"]
