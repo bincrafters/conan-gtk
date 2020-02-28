@@ -23,7 +23,7 @@ class LibnameConan(ConanFile):
         "with_pango": [True, False]
         }
     default_options = {
-        "shared": False,
+        "shared": True,
         "fPIC": True,
         "with_wayland": False,
         "with_x11": True,
