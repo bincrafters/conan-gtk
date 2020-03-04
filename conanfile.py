@@ -41,7 +41,7 @@ class LibnameConan(ConanFile):
     
     def build_requirements(self):
         self.build_requires('meson/0.53.2')
-        #self.build_requires('pkg-config_installer/0.29.2@bincrafters/stable')
+        self.build_requires('pkg-config_installer/0.29.2@bincrafters/stable')
     
     def requirements(self):
         self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
@@ -49,6 +49,7 @@ class LibnameConan(ConanFile):
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == 'Linux':
             self.requires("at-spi2-atk/2.34.1@bincrafters/stable")
+            self.requires("glib/2.64.0@bincrafters/stable")
             if self.options.with_wayland:
                 self.requires("xkbcommon/0.9.1@bincrafters/stable")
                 self.requires("wayland")
