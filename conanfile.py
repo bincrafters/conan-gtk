@@ -12,7 +12,6 @@ class LibnameConan(ConanFile):
     homepage = "https://www.gtk.org/"
     license = "LGPL-2.1"
     generators = "pkg_config"
-    short_paths = True
 
     settings = "os", "arch", "compiler", "build_type"
     options = {
@@ -77,6 +76,8 @@ class LibnameConan(ConanFile):
             if self.options.with_wayland or self.options.with_x11:
                 if not self.options.with_pango:
                     raise ConanInvalidConfiguration('with_pango option is mandatory when with_wayland or with_x11 is used')
+        if self.settings.os == 'Windows':
+            raise ConanInvalidConfiguration('GTK recipe is not yet compatible with Windows. Contributions are welcome.')
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
