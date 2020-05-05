@@ -5,3 +5,6 @@ sources:
   "3.24.14":
     url: "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.14.tar.xz"
     sha256: "1c4d69f93ab884fd80c6b95115bfbc12d51ecd029178b6dad3672fdc5ff91e88"
+  "3.24.18":
+    url: "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.18.tar.xz"
+    sha256: "f5eaff7f4602e44a9ca7bfad5382d7a73e509a8f00b0bcab91c198d096172ad2"
