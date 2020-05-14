@@ -1,5 +1,6 @@
 env: 
   CONAN_DOCKER_ENTRY_SCRIPT: conan config set storage.download_cache="/tmp/conan"
+  CONAN_DOCKER_RUN_OPTIONS: -v "/tmp/conan":"/tmp/conan"
 
 # bincrafters-conventions:gha-workflow-version:6
 # You can add custom environment variables above the version tag
@@ -82,4 +83,5 @@ jobs:
           CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }}
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
         run: |
+          mkdir /tmp/conan
           bincrafters-package-tools --auto
