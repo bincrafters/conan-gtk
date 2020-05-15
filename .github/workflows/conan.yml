@@ -8,6 +8,7 @@
 #   splitByBuildTypes: "false"  # Possible values "false", "true", default: false
 
 # You can furthermore set any environment variable understood by Conan and Conan Package Tools
+# trigger
 
 on: [push, pull_request]
 
