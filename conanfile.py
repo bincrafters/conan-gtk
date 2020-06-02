@@ -63,7 +63,7 @@ class LibnameConan(ConanFile):
                 self.requires("libxfixes/5.0.3@bincrafters/stable")
                 self.requires("libxcomposite/0.4.5@bincrafters/stable")
                 self.requires("libxinerama/1.1.4@bincrafters/stable")
-                self.requires("fontconfig/2.13.91@conan/stable")
+                self.requires("fontconfig/2.13.91")
         self.requires("atk/2.35.1@bincrafters/stable")
         self.requires("libepoxy/1.5.4@bincrafters/stable")
         if self.options.with_pango:
