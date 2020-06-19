@@ -53,17 +53,7 @@ class LibnameConan(ConanFile):
                 self.requires("xkbcommon/0.9.1@bincrafters/stable")
                 self.requires("wayland") # FIXME: Create an actual Wayland package(s)
             if self.options.with_x11:
-                self.requires("libxrandr/1.5.2@bincrafters/stable")
-                self.requires("libxrender/0.9.10@bincrafters/stable")
-                self.requires("libx11/1.6.8@bincrafters/stable")
-                self.requires("libxi/1.7.10@bincrafters/stable")
-                self.requires("libxext/1.3.4@bincrafters/stable")
-                self.requires("libxcursor/1.2.0@bincrafters/stable")
-                self.requires("libxdamage/1.1.5@bincrafters/stable")
-                self.requires("libxfixes/5.0.3@bincrafters/stable")
-                self.requires("libxcomposite/0.4.5@bincrafters/stable")
-                self.requires("libxinerama/1.1.4@bincrafters/stable")
-                self.requires("fontconfig/2.13.91")
+                self.requires("xorg/system")
         self.requires("atk/2.35.1@bincrafters/stable")
         self.requires("libepoxy/1.5.4@bincrafters/stable")
         if self.options.with_pango:
