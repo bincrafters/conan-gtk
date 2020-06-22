@@ -40,7 +40,8 @@ class LibnameConan(ConanFile):
     
     def build_requirements(self):
         self.build_requires("meson/0.54.2")
-        self.build_requires("pkg-config_installer/0.29.2@bincrafters/stable")
+        if not tools.which('pkg-config'):
+            self.build_requires("pkg-config_installer/0.29.2@bincrafters/stable")
     
     def requirements(self):
         self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
@@ -101,6 +102,7 @@ class LibnameConan(ConanFile):
                             continue
                         shutil.copyfile(os.path.join(dirpath, filename), filename)
                         tools.replace_prefix_in_pc_file(filename, lib_path)
+        tools.replace_in_file(os.path.join(self._source_subfolder, 'meson.build'), "\ntest(\n", "\nfalse and test(\n")
         with tools.environment_append(tools.RunEnvironment(self).vars):
             meson = self._configure_meson()
             meson.build()
