@@ -56,7 +56,7 @@ class LibnameConan(ConanFile):
             if self.options.with_x11:
                 self.requires("xorg/system")
         self.requires("atk/2.36.0@bincrafters/stable")
-        self.requires("libepoxy/1.5.4@bincrafters/stable")
+        self.requires("libepoxy/1.5.4")
         if self.options.with_pango:
             self.requires("pango/1.45.3@bincrafters/stable")
 
