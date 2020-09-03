@@ -49,9 +49,9 @@ class LibnameConan(ConanFile):
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == "Linux":
             self.requires("at-spi2-atk/2.34.2@bincrafters/stable")
-            self.requires("glib/2.64.0@bincrafters/stable")
+            self.requires("glib/2.65.1")
             if self.options.with_wayland:
-                self.requires("xkbcommon/0.9.1@bincrafters/stable")
+                self.requires("xkbcommon/0.10.0")
                 self.requires("wayland") # FIXME: Create an actual Wayland package(s)
             if self.options.with_x11:
                 self.requires("xorg/system")
