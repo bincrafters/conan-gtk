@@ -55,7 +55,7 @@ class LibnameConan(ConanFile):
                 self.requires("wayland") # FIXME: Create an actual Wayland package(s)
             if self.options.with_x11:
                 self.requires("xorg/system")
-        self.requires("atk/2.36.0@bincrafters/stable")
+        self.requires("atk/2.36.0")
         self.requires("libepoxy/1.5.4")
         if self.options.with_pango:
             self.requires("pango/1.46.1@bincrafters/stable")
