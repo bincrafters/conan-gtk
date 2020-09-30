@@ -48,7 +48,7 @@ class LibnameConan(ConanFile):
         if self.settings.compiler != "Visual Studio":
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == "Linux":
-            self.requires("at-spi2-atk/2.34.2@bincrafters/stable")
+            self.requires("at-spi2-atk/2.38.0@bincrafters/stable")
             self.requires("glib/2.66.0")
             if self.options.with_wayland:
                 self.requires("xkbcommon/0.10.0")
@@ -58,7 +58,7 @@ class LibnameConan(ConanFile):
         self.requires("atk/2.36.0")
         self.requires("libepoxy/1.5.4")
         if self.options.with_pango:
-            self.requires("pango/1.46.1@bincrafters/stable")
+            self.requires("pango/1.47.0@bincrafters/stable")
 
     def configure(self):
         del self.settings.compiler.libcxx
