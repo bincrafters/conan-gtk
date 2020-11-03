@@ -45,11 +45,11 @@ class LibnameConan(ConanFile):
     
     def requirements(self):
         self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
+        self.requires("glib/2.66.2")
         if self.settings.compiler != "Visual Studio":
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == "Linux":
             self.requires("at-spi2-atk/2.38.0@bincrafters/stable")
-            self.requires("glib/2.66.2")
             if self.options.with_wayland:
                 self.requires("xkbcommon/0.10.0")
                 self.requires("wayland") # FIXME: Create an actual Wayland package(s)
