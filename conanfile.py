@@ -58,7 +58,7 @@ class LibnameConan(ConanFile):
         self.requires("atk/2.36.0")
         self.requires("libepoxy/1.5.4")
         if self.options.with_pango:
-            self.requires("pango/1.47.0@bincrafters/stable")
+            self.requires("pango/1.48.0@bincrafters/stable")
 
     def configure(self):
         del self.settings.compiler.libcxx
