@@ -45,7 +45,7 @@ class LibnameConan(ConanFile):
     
     def requirements(self):
         self.requires("gdk-pixbuf/2.40.0@bincrafters/stable")
-        self.requires("glib/2.66.2")
+        self.requires("glib/2.67.0")
         if self.settings.compiler != "Visual Studio":
             self.requires("cairo/1.17.2@bincrafters/stable")
         if self.settings.os == "Linux":
