@@ -46,8 +46,7 @@ class LibnameConan(ConanFile):
     def requirements(self):
         self.requires("gdk-pixbuf/2.42.0@bincrafters/stable")
         self.requires("glib/2.67.0")
-        if self.settings.compiler != "Visual Studio":
-            self.requires("cairo/1.17.2@bincrafters/stable")
+        self.requires("cairo/1.17.2")
         if self.settings.os == "Linux":
             self.requires("at-spi2-atk/2.38.0@bincrafters/stable")
             if self.options.with_wayland:
@@ -93,13 +92,11 @@ class LibnameConan(ConanFile):
         return meson
 
     def build(self):
-        for package in self.deps_cpp_info.deps:
+        for package in ['pango']:
             lib_path = self.deps_cpp_info[package].rootpath
             for dirpath, _, filenames in os.walk(lib_path):
                 for filename in filenames:
                     if filename.endswith(".pc"):
-                        if filename in ["cairo.pc", "fontconfig.pc", "xext.pc", "xi.pc", "x11.pc", "xcb.pc"]:
-                            continue
                         shutil.copyfile(os.path.join(dirpath, filename), filename)
                         tools.replace_prefix_in_pc_file(filename, lib_path)
         tools.replace_in_file(os.path.join(self._source_subfolder, 'meson.build'), "\ntest(\n", "\nfalse and test(\n")
