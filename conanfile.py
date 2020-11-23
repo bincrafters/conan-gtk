@@ -24,7 +24,7 @@ class LibnameConan(ConanFile):
     default_options = {
         "shared": True,
         "fPIC": True,
-        "with_wayland": False,
+        "with_wayland": True,
         "with_x11": True,
         "with_pango": True}
 
@@ -51,7 +51,10 @@ class LibnameConan(ConanFile):
             self.requires("at-spi2-atk/2.38.0@bincrafters/stable")
             if self.options.with_wayland:
                 self.requires("xkbcommon/0.10.0")
-                self.requires("wayland") # FIXME: Create an actual Wayland package(s)
+                self.requires("wayland/1.18.0")
+                self.requires("wayland-protocols/1.20")
+                self.requires("libepoxy/1.5.4")
+                self.requires("expat/2.2.10", override=True)
             if self.options.with_x11:
                 self.requires("xorg/system")
         self.requires("atk/2.36.0")
@@ -100,6 +103,9 @@ class LibnameConan(ConanFile):
                         shutil.copyfile(os.path.join(dirpath, filename), filename)
                         tools.replace_prefix_in_pc_file(filename, lib_path)
         tools.replace_in_file(os.path.join(self._source_subfolder, 'meson.build'), "\ntest(\n", "\nfalse and test(\n")
+        if self.options.get_safe("with_wayland", False):
+            tools.replace_in_file(os.path.join("wayland-protocols.pc"), "Name: wayland-protocols",
+                                  "pkgdatadir=%s\nName: wayland-protocols" % os.path.join(self.deps_cpp_info['wayland-protocols'].rootpath, "res", "wayland-protocols"))
         with tools.environment_append(tools.RunEnvironment(self).vars):
             meson = self._configure_meson()
             meson.build()
