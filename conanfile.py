@@ -44,7 +44,7 @@ class LibnameConan(ConanFile):
             self.build_requires("pkgconf/1.7.3")
     
     def requirements(self):
-        self.requires("gdk-pixbuf/2.42.0@bincrafters/stable")
+        self.requires("gdk-pixbuf/2.42.0")
         self.requires("glib/2.67.0")
         self.requires("cairo/1.17.2")
         if self.settings.os == "Linux":
@@ -57,7 +57,7 @@ class LibnameConan(ConanFile):
         self.requires("atk/2.36.0")
         self.requires("libepoxy/1.5.4")
         if self.options.with_pango:
-            self.requires("pango/1.48.0@bincrafters/stable")
+            self.requires("pango/1.48.0")
 
     def configure(self):
         del self.settings.compiler.libcxx
