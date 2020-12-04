@@ -43,6 +43,7 @@ class LibnameConan(ConanFile):
         self.build_requires("meson/0.56.0")
         if not tools.which('pkg-config'):
             self.build_requires("pkgconf/1.7.3")
+        self.build_requires("libxml2/2.9.10")
     
     def requirements(self):
         self.requires("gdk-pixbuf/2.42.0")
