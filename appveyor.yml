@@ -1,6 +1,7 @@
 environment:
   PYTHON_HOME: "C:\\Python37"
   CONAN_TOTAL_PAGES: 6
+  CONAN_USE_ALWAYS_SHORT_PATHS: 1
 
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
