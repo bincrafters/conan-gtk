@@ -95,7 +95,7 @@ class LibnameConan(ConanFile):
         tools.replace_in_file(os.path.join(self._source_subfolder, 'meson.build'), "\ntest(\n", "\nfalse and test(\n")
         with tools.environment_append(tools.RunEnvironment(self).vars):
             meson = self._configure_meson()
-            meson.build()
+            meson.build(args=["-v"])
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
