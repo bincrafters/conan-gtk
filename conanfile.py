@@ -38,7 +38,7 @@ class LibnameConan(ConanFile):
             del self.options.with_x11
     
     def build_requirements(self):
-        self.build_requires("meson/0.54.2")
+        self.build_requires("meson/0.55.2")
         if not tools.which('pkg-config'):
             self.build_requires("pkgconf/1.7.3")
     
@@ -46,17 +46,24 @@ class LibnameConan(ConanFile):
         self.requires("gdk-pixbuf/2.42.0")
         self.requires("glib/2.67.0")
         self.requires("cairo/1.17.2")
+        self.requires("graphene/1.10.2")
         if self.settings.os == "Linux":
-            self.requires("at-spi2-atk/2.38.0@bincrafters/stable")
+            self.requires("xkbcommon/1.0.3")
             if self.options.with_wayland:
-                self.requires("xkbcommon/0.10.0")
                 self.requires("wayland") # FIXME: Create an actual Wayland package(s)
             if self.options.with_x11:
                 self.requires("xorg/system")
-        self.requires("atk/2.36.0")
         self.requires("libepoxy/1.5.4")
         if self.options.with_pango:
             self.requires("pango/1.48.0")
+
+    def system_requirements(self):
+        if self.settings.os == 'Linux' and tools.os_info.is_linux:
+            if tools.os_info.with_apt:
+                installer = tools.SystemPackageTool()
+                packages = ['sassc']
+                for package in packages:
+                    installer.install(package)
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -71,19 +78,19 @@ class LibnameConan(ConanFile):
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
         extracted_dir = self.name + "-" + self.version
-        os.rename(extracted_dir.replace("gtk", "gtk+"), self._source_subfolder)
+        os.rename(extracted_dir, self._source_subfolder)
 
     def _configure_meson(self):
         meson = Meson(self)
         defs = {}
         if self.settings.os == "Linux":
-            defs["wayland_backend"] = "true" if self.options.with_wayland else "false"
-            defs["x11_backend"] = "true" if self.options.with_x11 else "false"
-        defs["introspection"] = "false"
+            defs["wayland-backend"] = "true" if self.options.with_wayland else "false"
+            defs["x11-backend"] = "true" if self.options.with_x11 else "false"
+        defs["introspection"] = "disabled"
         defs["documentation"] = "false"
         defs["man-pages"] = "false"
-        defs["tests"] = "false"
-        defs["examples"] = "false"
+        defs["build-tests"] = "false"
+        defs["build-examples"] = "false"
         defs["demos"] = "false"
         args=[]
         args.append("--wrap-mode=nofallback")
@@ -91,7 +98,6 @@ class LibnameConan(ConanFile):
         return meson
 
     def build(self):
-        tools.replace_in_file(os.path.join(self._source_subfolder, 'meson.build'), "\ntest(\n", "\nfalse and test(\n")
         with tools.environment_append(tools.RunEnvironment(self).vars):
             meson = self._configure_meson()
             meson.build()
@@ -99,7 +105,9 @@ class LibnameConan(ConanFile):
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
         meson = self._configure_meson()
-        with tools.environment_append({"PKG_CONFIG_PATH": self.install_folder}):
+        with tools.environment_append({
+            "PKG_CONFIG_PATH": self.install_folder,
+            "PATH": [os.path.join(self.package_folder, "bin")]}):
             meson.install()
         # If the CMakeLists.txt has a proper install method, the steps below may be redundant
         # If so, you can just remove the lines below
@@ -112,9 +120,8 @@ class LibnameConan(ConanFile):
         self.copy(pattern="*.dylib", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ["gailutil-3", "gtk-3", "gdk-3"]
-        self.cpp_info.includedirs.append(os.path.join("include", "gtk-3.0"))
-        self.cpp_info.includedirs.append(os.path.join("include", "gail-3.0"))
+        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.includedirs.append(os.path.join("include", "gtk-4.0"))
         self.cpp_info.names["pkg_config"] = "gtk+-3.0"
         if self.settings.os == "Macos":
             self.cpp_info.frameworks = ["AppKit", "Carbon"]

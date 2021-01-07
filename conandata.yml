@@ -17,3 +17,6 @@ sources:
   "3.24.22":
     url: "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.22.tar.xz"
     sha256: "bf18a4a5dff28a7b02aaef1b949c2d09c96c18387eddab152bb4cd55a5b67dda"
+  "4.0.0":
+    url: "https://download.gnome.org/sources/gtk/4.0/gtk-4.0.0.tar.xz"
+    sha256: "d46cf5b127ea27dd9e5d2ff6ed500cb4067eeb2cb1cd2c313ccde8013b0b9bf9"
